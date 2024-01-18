@@ -14,6 +14,17 @@ public class Inventario {
     @JoinColumn(name = "produto_id", nullable = false, unique = true)
     private Produto produto;
 
+    @Column(name = "quantidade", nullable = false)
+    private Integer quantidade;
+
+    public Integer getQuantidade() {
+        return quantidade;
+    }
+
+    public void setQuantidade(Integer quantidade) {
+        this.quantidade = quantidade;
+    }
+
     public Produto getProduto() {
         return produto;
     }
