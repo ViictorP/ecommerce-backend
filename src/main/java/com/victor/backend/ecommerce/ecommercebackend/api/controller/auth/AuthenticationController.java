@@ -3,6 +3,7 @@ package com.victor.backend.ecommerce.ecommercebackend.api.controller.auth;
 import com.victor.backend.ecommerce.ecommercebackend.api.model.RegistrationBody;
 import com.victor.backend.ecommerce.ecommercebackend.exception.UserAlreadyExistsException;
 import com.victor.backend.ecommerce.ecommercebackend.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class AuthenticationController {
     private UsuarioService usuarioService;
 
     @PostMapping("/registrar")
-    public ResponseEntity registerUser(@RequestBody RegistrationBody registrationBody) {
+    public ResponseEntity registerUser(@Valid @RequestBody RegistrationBody registrationBody) {
         try {
             usuarioService.registerUser(registrationBody);
             return ResponseEntity.ok().build();

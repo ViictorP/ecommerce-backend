@@ -16,7 +16,7 @@ public class UsuarioService {
     public UsuarioLocal registerUser(RegistrationBody registrationBody) throws UserAlreadyExistsException {
 
         if (usuarioLocalDAO.findByEmailIgnoreCase(registrationBody.getEmail()).isPresent()
-                || usuarioLocalDAO.findByUsernameIgnoreCase(registrationBody.getUsername()).isPresent()) {
+        || usuarioLocalDAO.findByUsernameIgnoreCase(registrationBody.getUsername()).isPresent()) {
             throw new UserAlreadyExistsException();
         }
 
