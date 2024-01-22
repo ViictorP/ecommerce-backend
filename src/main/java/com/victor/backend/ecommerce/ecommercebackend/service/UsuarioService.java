@@ -12,6 +12,8 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioLocalDAO usuarioLocalDAO;
+    @Autowired
+    private EncryptionService encryptionService;
 
     public UsuarioLocal registerUser(RegistrationBody registrationBody) throws UserAlreadyExistsException {
 
@@ -25,8 +27,7 @@ public class UsuarioService {
         usuarioLocal.setEmail(registrationBody.getEmail());
         usuarioLocal.setFirstName(registrationBody.getFirstName());
         usuarioLocal.setLastName(registrationBody.getLastName());
-        // TODO: Encrypt password
-        usuarioLocal.setPassword(registrationBody.getPassword());
+        usuarioLocal.setPassword(encryptionService.encryptPassword(registrationBody.getPassword()));
         
         return usuarioLocalDAO.save(usuarioLocal);
     }
