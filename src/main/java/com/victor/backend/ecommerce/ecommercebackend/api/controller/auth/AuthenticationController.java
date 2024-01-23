@@ -1,5 +1,7 @@
 package com.victor.backend.ecommerce.ecommercebackend.api.controller.auth;
 
+import com.victor.backend.ecommerce.ecommercebackend.api.model.LoginBody;
+import com.victor.backend.ecommerce.ecommercebackend.api.model.LoginResponse;
 import com.victor.backend.ecommerce.ecommercebackend.api.model.RegistrationBody;
 import com.victor.backend.ecommerce.ecommercebackend.exception.UserAlreadyExistsException;
 import com.victor.backend.ecommerce.ecommercebackend.service.UsuarioService;
@@ -26,6 +28,18 @@ public class AuthenticationController {
             return ResponseEntity.ok().build();
         } catch (UserAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> loginUser(@Valid @RequestBody LoginBody loginBody) {
+        String jwt = usuarioService.loginUser(loginBody);
+        if (jwt == null) {
+            return ResponseEntity.status((HttpStatus.BAD_REQUEST)).build();
+        } else {
+            LoginResponse loginResponse = new LoginResponse();
+            loginResponse.setJwt(jwt);
+            return ResponseEntity.ok(loginResponse);
         }
     }
 }

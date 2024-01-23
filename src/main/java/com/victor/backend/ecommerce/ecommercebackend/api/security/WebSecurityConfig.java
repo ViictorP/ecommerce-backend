@@ -11,8 +11,8 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         //TODO: Proper authentication.
-        http.csrf().disable().cors().disable();
-        http.authorizeHttpRequests().anyRequest().permitAll();
+        http.csrf(csrf -> csrf.disable()).cors(cors -> cors.disable());
+        http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
         return http.build();
     }
 }
