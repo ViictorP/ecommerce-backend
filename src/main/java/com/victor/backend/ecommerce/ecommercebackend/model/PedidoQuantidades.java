@@ -1,5 +1,6 @@
 package com.victor.backend.ecommerce.ecommercebackend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,6 +18,7 @@ public class PedidoQuantidades {
     @Column(name = "quantidade")
     private Integer quantidade;
 
+    @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name = "pedido_id", nullable = false)
     private Pedido pedido;

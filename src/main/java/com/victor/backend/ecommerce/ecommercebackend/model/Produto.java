@@ -1,5 +1,6 @@
 package com.victor.backend.ecommerce.ecommercebackend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity

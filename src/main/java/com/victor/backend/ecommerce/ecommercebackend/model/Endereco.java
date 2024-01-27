@@ -1,5 +1,6 @@
 package com.victor.backend.ecommerce.ecommercebackend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -34,6 +35,7 @@ public class Endereco {
     @Column(name = "pais", length = 100)
     private String pais;
 
+    @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)
     private UsuarioLocal usuario;
