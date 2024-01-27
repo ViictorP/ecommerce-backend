@@ -4,15 +4,14 @@ import com.victor.backend.ecommerce.ecommercebackend.api.model.LoginBody;
 import com.victor.backend.ecommerce.ecommercebackend.api.model.LoginResponse;
 import com.victor.backend.ecommerce.ecommercebackend.api.model.RegistrationBody;
 import com.victor.backend.ecommerce.ecommercebackend.exception.UserAlreadyExistsException;
+import com.victor.backend.ecommerce.ecommercebackend.model.UsuarioLocal;
 import com.victor.backend.ecommerce.ecommercebackend.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -41,5 +40,10 @@ public class AuthenticationController {
             loginResponse.setJwt(jwt);
             return ResponseEntity.ok(loginResponse);
         }
+    }
+
+    @GetMapping("/me")
+    public UsuarioLocal getLoggedInUserProfile(@AuthenticationPrincipal UsuarioLocal usuario) {
+        return usuario;
     }
 }
