@@ -4,11 +4,15 @@ import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.victor.backend.ecommerce.ecommercebackend.api.model.LoginBody;
+import com.victor.backend.ecommerce.ecommercebackend.api.model.PasswordResetBody;
 import com.victor.backend.ecommerce.ecommercebackend.api.model.RegistrationBody;
 import com.victor.backend.ecommerce.ecommercebackend.exception.EmailFailureException;
+import com.victor.backend.ecommerce.ecommercebackend.exception.EmailNotFoundExeption;
 import com.victor.backend.ecommerce.ecommercebackend.exception.UserAlreadyExistsException;
 import com.victor.backend.ecommerce.ecommercebackend.exception.UserNotVerifiedException;
+import com.victor.backend.ecommerce.ecommercebackend.model.UsuarioLocal;
 import com.victor.backend.ecommerce.ecommercebackend.model.VerificationToken;
+import com.victor.backend.ecommerce.ecommercebackend.model.dao.UsuarioLocalDAO;
 import com.victor.backend.ecommerce.ecommercebackend.model.dao.VerificationTokenDAO;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
@@ -36,6 +40,15 @@ public class UsuarioServiceTest {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private UsuarioLocalDAO usuarioLocalDAO;
+
+    @Autowired
+    private JWTService jwtService;
+
+    @Autowired
+    private EncryptionService encryptionService;
 
     @Test
     @Transactional
@@ -109,8 +122,38 @@ public class UsuarioServiceTest {
         } catch (UserNotVerifiedException ex) {
             List<VerificationToken> tokens = verificationTokenDAO.findByUsuario_IdOrderByUsuario_IdDesc(2L);
             String token = tokens.get(0).getToken();
+
             Assertions.assertTrue(usuarioService.verifyUser(token), "Token deve ser valido.");
+
             Assertions.assertNotNull(body, "Usuario deve ser verificado.");
         }
+    }
+
+    @Test
+    @Transactional
+    public void testForgotPassword() throws MessagingException {
+        Assertions.assertThrows(EmailNotFoundExeption.class,
+                () -> usuarioService.forgotPassword("UserNotExist@junit.com"));
+
+        Assertions.assertDoesNotThrow(() -> usuarioService.forgotPassword(
+                "UserA@junit.com"), "Email não existe, portanto deve ser rejeitado");
+
+        Assertions.assertEquals("UserA@junit.com", greenMailExtension.getReceivedMessages()[0]
+                        .getRecipients(Message.RecipientType.TO)[0]
+                .toString(), "Email para troca de senha deve ser enviado");
+    }
+
+    @Test
+    public void testResetPassword() {
+        UsuarioLocal user = usuarioLocalDAO.findByUsernameIgnoreCase("UserA").get();
+        String token = jwtService.generateResetPassordJWT(user);
+        PasswordResetBody body = new PasswordResetBody();
+        body.setToken(token);
+        body.setPassword("Password123456");
+        usuarioService.resetPassword(body);
+        user = usuarioLocalDAO.findByUsernameIgnoreCase("UserA").get();
+
+        Assertions.assertTrue(encryptionService.verifyPassword("Password123456",
+                user.getPassword()), "Password deve ser salvo no Banco de dados");
     }
 }

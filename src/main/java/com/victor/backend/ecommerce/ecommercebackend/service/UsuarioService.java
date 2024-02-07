@@ -1,8 +1,10 @@
 package com.victor.backend.ecommerce.ecommercebackend.service;
 
 import com.victor.backend.ecommerce.ecommercebackend.api.model.LoginBody;
+import com.victor.backend.ecommerce.ecommercebackend.api.model.PasswordResetBody;
 import com.victor.backend.ecommerce.ecommercebackend.api.model.RegistrationBody;
 import com.victor.backend.ecommerce.ecommercebackend.exception.EmailFailureException;
+import com.victor.backend.ecommerce.ecommercebackend.exception.EmailNotFoundExeption;
 import com.victor.backend.ecommerce.ecommercebackend.exception.UserAlreadyExistsException;
 import com.victor.backend.ecommerce.ecommercebackend.exception.UserNotVerifiedException;
 import com.victor.backend.ecommerce.ecommercebackend.model.UsuarioLocal;
@@ -95,5 +97,26 @@ public class UsuarioService {
             }
         }
         return false;
+    }
+
+    public void forgotPassword(String email) throws EmailNotFoundExeption, EmailFailureException {
+        Optional<UsuarioLocal> opUser = usuarioLocalDAO.findByEmailIgnoreCase(email);
+        if (opUser.isPresent()) {
+            UsuarioLocal usuario = opUser.get();
+            String token = jwtService.generateResetPassordJWT(usuario);
+            emailService.sendPasswordResetEamil(usuario, token);
+        } else {
+            throw new EmailNotFoundExeption();
+        }
+    }
+
+    public void resetPassword(PasswordResetBody body) {
+        String email = jwtService.getResetPasswordEmail(body.getToken());
+        Optional<UsuarioLocal> opUser = usuarioLocalDAO.findByEmailIgnoreCase(email);
+        if (opUser.isPresent()) {
+            UsuarioLocal usuarioLocal = opUser.get();
+            usuarioLocal.setPassword(encryptionService.encryptPassword(body.getPassword()));
+            usuarioLocalDAO.save(usuarioLocal);
+        }
     }
 }
